@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>UniPath Vault</title>
+<style>
+:root{--bg:linear-gradient(160deg,#fff1fb 0%,#efe7ff 55%,#e4f1ff 100%);--card:rgba(255,255,255,.88);--bd:#eadcff;--ac:#8b5cf6;--btn:linear-gradient(135deg,#8b5cf6,#c084fc);--on:#fff;--pink:#ec4899;--tx:#3b2a5c;--mu:#8b79a8;--ok:#0f9d73;--bad:#e11d48;--in:#faf6ff;--sh:0 8px 24px rgba(139,92,246,.13);--bub:#fff0f8;--deco:1}
+[data-theme=dark]{--bg:#16141d;--card:#1f1c29;--bd:#2d2939;--ac:#a78bfa;--btn:#a78bfa;--on:#1a1625;--pink:#a78bfa;--tx:#e8e4f2;--mu:#9a93ad;--ok:#6ee7b7;--bad:#fda4af;--in:#17151f;--sh:none;--bub:#252131;--deco:0}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{margin:0;font-family:"Nunito","Quicksand",ui-rounded,-apple-system,"Segoe UI",Roboto,sans-serif;background:var(--bg);background-attachment:fixed;color:var(--tx);min-height:100vh}
+.hidden{display:none!important}
+#deco span{position:fixed;font-size:22px;opacity:calc(.5*var(--deco));pointer-events:none;animation:fl 7s ease-in-out infinite;z-index:0}
+@keyframes fl{50%{transform:translateY(-14px) rotate(8deg)}}
+@media(prefers-reduced-motion:reduce){*{animation:none!important}}
+[data-theme=dark] *{animation:none!important}
+header{position:sticky;top:0;z-index:20;display:flex;align-items:center;justify-content:space-between;padding:calc(12px + env(safe-area-inset-top)) 16px 12px;background:var(--card);border-bottom:1px solid var(--bd);backdrop-filter:blur(10px)}
+header b{font-size:16px}header small{display:block;color:var(--mu);font-size:11px;font-weight:600}
+.ib{background:var(--in);border:1px solid var(--bd);border-radius:14px;width:40px;height:40px;font-size:18px;cursor:pointer;color:var(--tx)}
+main{position:relative;z-index:1;max-width:500px;margin:0 auto;padding:16px 16px 110px;display:flex;flex-direction:column;gap:14px}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:24px;padding:18px;box-shadow:var(--sh)}
+.hero{display:flex;align-items:center;gap:14px}
+.mascot{font-size:54px;line-height:1;animation:bob 3s ease-in-out infinite}
+@keyframes bob{50%{transform:translateY(-6px) rotate(-4deg)}}
+.bubble{background:var(--bub);border:1px solid var(--bd);border-radius:18px 18px 18px 4px;padding:10px 14px;font-size:13px;font-weight:700;color:var(--tx)}
+.lbl{font-size:13px;font-weight:800;color:var(--mu);margin-bottom:8px}
+.big{font-size:34px;font-weight:900;letter-spacing:-1px;color:var(--ac)}
+.eye{margin-left:auto;align-self:flex-start;background:none;border:0;font-size:18px;cursor:pointer}
+.blur{filter:blur(7px);opacity:.5}
+input,select,textarea{width:100%;padding:14px;margin:0 0 10px;border-radius:16px;border:1.5px solid var(--bd);background:var(--in);color:var(--tx);font:600 15px inherit;outline:none}
+input:focus,select:focus,textarea:focus{border-color:var(--ac)}
+textarea{height:110px;font:11px monospace}
+.btn{width:100%;border:0;border-radius:16px;padding:15px;font:800 15px inherit;background:var(--btn);color:var(--on);cursor:pointer;margin-top:2px}
+.btn:active,.chip:active,.sm:active{transform:scale(.97)}
+.btn.soft{background:var(--in);color:var(--ac);border:1.5px dashed var(--ac)}
+.btn.ghost{background:none;color:var(--mu)}
+.btn.warn{background:none;color:var(--bad);border:1.5px solid var(--bad)}
+.chip{display:inline-block;background:var(--in);color:var(--tx);border:1.5px solid var(--bd);border-radius:999px;padding:9px 14px;font:700 13px inherit;margin:0 6px 8px 0;cursor:pointer}
+.chip.add{border-style:dashed;color:var(--ac)}
+.chip i{font-style:normal;color:var(--mu);margin-left:6px}
+.row{display:flex;gap:10px}.row>*{flex:1}
+.log{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:11px 0;border-bottom:1px dashed var(--bd);font-size:14px;font-weight:700}
+.log:last-child{border:0;padding-bottom:0}.log small{display:block;color:var(--mu);font-size:11px;font-weight:600}
+.sm{border:0;border-radius:11px;padding:8px 12px;font:800 12px inherit;background:var(--in);color:var(--ac);cursor:pointer;border:1px solid var(--bd)}
+.sm.d{color:var(--bad)}
+.bar{height:10px;background:var(--in);border-radius:99px;overflow:hidden;margin-top:10px;border:1px solid var(--bd)}
+.bar i{display:block;height:100%;background:var(--btn);border-radius:99px}
+.empty{text-align:center;color:var(--mu);font-weight:700;font-size:13px;padding:8px}
+.neg{color:var(--bad)}.pos{color:var(--ok)}
+nav{position:fixed;left:0;right:0;bottom:0;z-index:30;display:flex;justify-content:space-around;padding:8px 6px calc(8px + env(safe-area-inset-bottom));background:var(--card);border-top:1px solid var(--bd);backdrop-filter:blur(10px)}
+nav button{flex:1;background:none;border:0;border-radius:14px;padding:6px 0;font:800 10px inherit;color:var(--mu);cursor:pointer}
+nav button span{display:block;font-size:20px;margin-bottom:2px}
+nav button.on{color:var(--ac);background:var(--in)}
+#dlg{position:fixed;inset:0;z-index:100;background:rgba(40,20,70,.45);display:none;align-items:center;justify-content:center;padding:20px}
+#dlg.show{display:flex}
+#dlgBox{background:var(--card);background-color:var(--in);border:1px solid var(--bd);border-radius:26px;padding:22px;width:100%;max-width:380px;max-height:85vh;overflow:auto}
+#dlgBox h3{margin:0 0 10px;font-size:19px}#dlgBox p{color:var(--mu);font-size:13px;font-weight:600;margin:0 0 12px}
+#toast{position:fixed;left:50%;bottom:100px;transform:translateX(-50%);background:var(--tx);color:var(--in);padding:11px 18px;border-radius:999px;font:800 13px inherit;z-index:400;opacity:0;pointer-events:none;transition:opacity .25s;max-width:88%;text-align:center}
+#toast.show{opacity:1}
+h1{margin:0 0 6px;font-size:26px;text-align:center}
+.sub{text-align:center;color:var(--mu);font-weight:700;font-size:13px;margin-bottom:14px}
+</style>
+</head>
+<body>
+<div id="deco"><span style="top:12%;left:6%">✨</span><span style="top:30%;right:7%;animation-delay:1s">🌸</span><span style="top:58%;left:4%;animation-delay:2s">💜</span><span style="top:78%;right:6%;animation-delay:3s">🫧</span><span style="top:45%;left:88%;animation-delay:4s">⭐</span></div>
+<header id="top" class="hidden"><button class="ib" data-act="menu">⚙️</button><div style="text-align:center"><b>UniPath Vault 🐰</b><small id="mlabel"></small></div><button class="ib" data-act="theme" id="tbtn">🌙</button></header>
+<main id="view"></main>
+<nav id="nav" class="hidden"></nav>
+<div id="dlg"><div id="dlgBox"></div></div>
+<div id="lock" class="hidden" style="position:fixed;inset:0;z-index:300;background:var(--in);display:flex;align-items:center;justify-content:center;padding:24px"><div class="card" style="width:100%;max-width:340px;text-align:center"><div style="font-size:56px">🔒</div><h1>Enter PIN</h1><input id="pinIn" type="password" inputmode="numeric" maxlength="4" placeholder="••••" style="text-align:center;font-size:24px;letter-spacing:8px"><button class="btn" data-act="unlock">Unlock</button></div></div>
+<div id="toast"></div>
+
+<script>
+const MN=["January","February","March","April","May","June","July","August","September","October","November","December"];
+const $=id=>document.getElementById(id);
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const fmt=n=>(+n||0).toLocaleString();
+const fresh=()=>({onboarded:false,mIdx:new Date().getMonth(),year:new Date().getFullYear(),startMoney:0,foodBal:0,unallocSavings:0,vaults:[],subs:[],foodLog:[],shortcuts:[],debtsIOwe:[],debtsTheyOwe:[],investTotal:0,wantsLog:[],history:[],mo:{inv:0,out:0},theme:"light"});
+let state=fresh(),scr='start',privacy=false,histSel=-1;
+const TABS=[['home','🍙','Food'],['vaults','🐷','Vaults'],['subs','🔔','Subs'],['invest','🌱','Invest'],['wants','🎀','Wants'],['debts','🤝','Debts']];
+const PETS=['🐷','🐻','🦊','🐱','🐼','🦄'];
+
+function save(){try{localStorage.setItem("UniPath_V2",JSON.stringify(state))}catch(e){}}
+function load(){try{const m=localStorage.getItem("UniPath_V2");if(m)state=Object.assign(fresh(),JSON.parse(m))}catch(e){}
+ scr=state.onboarded?'home':'start';applyTheme();render();if(state.pin)$('lock').classList.remove('hidden');else remind()}
+function toast(t){const e=$('toast');e.textContent=t;e.classList.add('show');clearTimeout(toast.t);toast.t=setTimeout(()=>e.classList.remove('show'),2200)}
+function applyTheme(){document.documentElement.setAttribute('data-theme',state.theme);$('tbtn').textContent=state.theme=='dark'?'☀️':'🌙'}
+
+/* ---- dialogs (no alert/confirm/prompt: those are blocked in many WebViews) ---- */
+function closeDlg(){$('dlg').classList.remove('show')}
+function dlg(title,fields,okTxt,cb,msg){
+ let h=`<h3>${title}</h3>`+(msg?`<p>${msg}</p>`:'');
+ fields.forEach((f,i)=>{
+  if(f.opts)h+=`<select id="f${i}">${f.opts.map(o=>`<option value="${esc(o[0])}">${esc(o[1])}</option>`).join('')}</select>`;
+  else if(f.t=='ta')h+=`<textarea id="f${i}" placeholder="${esc(f.p)}">${esc(f.v||'')}</textarea>`;
+  else h+=`<input id="f${i}" type="${f.t||'text'}" placeholder="${esc(f.p)}" value="${esc(f.v==null?'':f.v)}" ${f.t=='number'?'inputmode="decimal"':''}>`});
+ if(cb)h+=`<button class="btn" id="dok">${okTxt}</button>`;
+ h+=`<button class="btn ghost" id="dno">${cb?'Cancel':'Close'}</button>`;
+ $('dlgBox').innerHTML=h;$('dlg').classList.add('show');
+ $('dno').onclick=closeDlg;
+ if(cb)$('dok').onclick=()=>{if(cb(fields.map((f,i)=>$('f'+i).value))!==false)closeDlg()};
+}
+$('dlg').addEventListener('click',e=>{if(e.target.id=='dlg')closeDlg()});
+
+/* ---- money helpers ---- */
+const places=()=>[['food','🍙 Food'],['unsav','💜 Free savings'],...state.vaults.map((v,i)=>['v'+i,PETS[i%6]+' '+v.name])];
+const get=k=>k=='food'?state.foodBal:k=='unsav'?state.unallocSavings:(state.vaults[+k.slice(1)]||{bal:0}).bal;
+const add=(k,n)=>{if(k=='food')state.foodBal+=n;else if(k=='unsav'||!state.vaults[+k.slice(1)])state.unallocSavings+=n;else state.vaults[+k.slice(1)].bal+=n};
+const pname=k=>(places().find(p=>p[0]==k)||['','💜 Free savings'])[1];
+const num=v=>{const n=parseFloat(v);return isNaN(n)?0:n};
+
+/* ---- actions ---- */
+const A={
+ go(i,b){scr=b.dataset.p;render()},
+ theme(){state.theme=state.theme=='dark'?'light':'dark';applyTheme();save()},
+ eye(){privacy=!privacy;render()},
+ start(){
+  const y=parseInt($('sY').value),s=num($('sS').value);
+  if(!s||s<=0)return toast('Enter your starting money first 💸');
+  state.mIdx=+$('sM').value;state.year=y||state.year;state.startMoney=s;scr='alloc';render()},
+ rest(){const f=num($('aF').value);$('aS').value=Math.max(0,state.startMoney-f-vsum())||'';calc()},
+ finalize(){
+  const f=num($('aF').value),s=num($('aS').value),left=state.startMoney-f-s-vsum();
+  if(left<0)return toast('That is more than you have 🥺');
+  state.foodBal+=f;state.vaults.forEach((v,i)=>{v.bal+=num(($('aV'+i)||{}).value)});state.unallocSavings+=s+left;state.onboarded=true;scr='home';render();
+  toast(left>0?'Done! The leftover went to free savings 💜':'Budget ready! 🎉')},
+ logfood(){
+  const n=$('fn').value.trim()||'Food',c=num($('fc').value);
+  if(c<=0)return toast('Enter the cost 🍜');
+  logMeal(c,n)},
+ hist(){closeDlg();scr='hist';histSel=-1;render();window.scrollTo(0,0)},
+ income(){dlg('Add money 💰',[{p:'Amount',t:'number'},{p:'What is it from? (optional)'},{opts:places()}],'Add money',v=>{
+   const a=num(v[0]);if(a<=0){toast('Enter an amount');return false}
+   add(v[2],a);state.mo.inc.push({name:v[1].trim()||'Income',amt:a});render();toast('Added 💰')},'Choose where it should go.');
+  $('f2').value='unsav'},
+ delmeal(i){const l=state.foodLog[i];if(!l)return;dlg('Delete this meal? 🗑',[],'Delete & refund',()=>{state.foodBal+=l.cost;state.foodLog.splice(i,1);render();toast('Refunded '+fmt(l.cost))},esc(l.name)+' · '+fmt(l.cost)+' TWD goes back to your food budget.')},
+ editsub(i){const s=state.subs[i];if(!s)return;closeDlg();const d=dueDate(s);
+  dlg('Edit subscription ✏️',[{p:'Service name',v:s.name},{p:'Cost',t:'number',v:s.cost},{opts:[[1,'Every month'],[3,'Every 3 months'],[6,'Every 6 months'],[12,'Every year']]},{p:'Due day (1-31)',t:'number',v:s.dueDay},{opts:MN.map((m,k)=>[k,m])}],'Save changes',v=>{
+   const c=num(v[1]),dy=parseInt(v[3]);
+   if(!v[0].trim()||c<=0||!(dy>=1&&dy<=31)){toast('Fill name, cost and a day 1-31');return false}
+   const mo=+v[4];s.name=v[0].trim();s.cost=c;s.cycle=+v[2];s.dueDay=dy;
+   s.dueYear=mo<d.getMonth()?d.getFullYear()+1:d.getFullYear();s.dueMonth=mo;render()});
+  $('f2').value=s.cycle;$('f4').value=d.getMonth()},
+ pin(){closeDlg();
+  if(state.pin)dlg('Remove PIN? 🔒',[{p:'Current PIN',t:'password'}],'Remove PIN',v=>{if(v[0]!==state.pin){toast('Wrong PIN');return false}state.pin=null;save();toast('PIN removed')});
+  else dlg('Set a PIN 🔒',[{p:'4-digit PIN',t:'password'}],'Save PIN',v=>{if(!/^\d{4}$/.test(v[0])){toast('Use exactly 4 digits');return false}state.pin=v[0];save();toast('PIN is on 🔒')},'The app asks for it every time you open it. Make a backup first: if you forget the PIN, the only way in is clearing the app data.')},
+ unlock(){if($('pinIn').value===state.pin){$('lock').classList.add('hidden');$('pinIn').value='';remind()}else{toast('Wrong PIN 🔒');$('pinIn').value=''}},
+ vadd(i){const vs=places().filter(p=>p[0][0]=='v');if(!vs.length)return toast('Create a vault first 🐷');
+  dlg('Add to a vault 🐷',[{opts:vs},{p:'Amount',t:'number'},{opts:places().filter(p=>p[0]!='food')}],'Add money',v=>{
+   const a=num(v[1]);if(a<=0){toast('Enter an amount');return false}
+   if(v[0]==v[2]){toast('Pick a different source');return false}
+   if(a>get(v[2])){toast('Not enough there 🥺');return false}
+   add(v[2],-a);add(v[0],a);render();toast('Added to '+pname(v[0])+' 💜')},'Free savings available: '+fmt(state.unallocSavings));
+  if(!isNaN(i))$('f0').value='v'+i;$('f2').value='unsav'},
+ finish(i){const v=state.vaults[i];if(!v)return;closeDlg();
+  const done=v.goal>0&&v.bal>=v.goal,opts=[['spent','I spent it (on the goal)'],['unsav','Return it to free savings']].concat(places().filter(p=>p[0][0]=='v'&&p[0]!='v'+i).map(p=>[p[0],'Move to '+p[1]]));
+  dlg(done?'🏆 Complete '+esc(v.name):'Close '+esc(v.name)+'?',v.bal>0?[{opts}]:[],done?'Complete vault':'Close vault',f=>{
+   const to=f[0]||'spent';
+   if(to!='spent'&&v.bal>0)add(to,v.bal);
+   (state.vaultsDone=state.vaultsDone||[]).unshift({name:v.name,goal:v.goal,saved:v.bal,reached:done,how:to=='spent'?'spent':'moved',mIdx:state.mIdx,year:state.year});
+   state.vaults.splice(i,1);if(state.vStart)state.vStart.splice(i,1);
+   const fix=a=>a.forEach(d=>{if(d.key[0]=='v'){const n=+d.key.slice(1);d.key=n==i?'unsav':n>i?'v'+(n-1):d.key}});
+   fix(state.debtsTheyOwe);fix(state.debtsIOwe);render();toast(done?'Vault completed 🏆':'Vault closed')},
+   'Saved: '+fmt(v.bal)+' TWD. What should happen to the money in it?');
+  if(v.bal>0)$('f0').value='spent'},
+ paysub(i){const s=state.subs[i];if(!s)return;closeDlg();
+  dlg('Pay '+esc(s.name)+' 🔔',[{opts:places()}],'Mark paid',v=>{
+   if(s.cost>get(v[0])){toast('Not enough there 🥺');return false}
+   add(v[0],-s.cost);state.mo.subs.push({name:s.name,cost:s.cost});
+   let d=dueDate(s),m=d.getMonth(),y=d.getFullYear(),k=0;
+   do{m+=s.cycle;y+=Math.floor(m/12);m%=12;s.dueMonth=m;s.dueYear=y;k++}while(dueDate(s)<today()&&k<60);
+   render();toast('Paid ✅ next due '+MN[s.dueMonth]+' '+s.dueDay)},fmt(s.cost)+' TWD · choose where it comes from');
+  $('f0').value='unsav'},
+ mpick(){const L=[`<button class="btn ${histSel<0?'':'soft'}" data-act="mpickset" data-i="-1" style="margin-bottom:8px">This month · ${MN[state.mIdx]} ${state.year}</button>`].concat(state.history.map((m,i)=>`<button class="btn ${histSel==i?'':'soft'}" data-act="mpickset" data-i="${i}" style="margin-bottom:8px">${MN[m.mIdx]} ${m.year}</button>`));
+  dlg('Choose a month 📅',[],null,null,L.join('')+(state.history.length?'':'<br>Past months appear after you tap Start next month.'))},
+ mpickset(i){closeDlg();histSel=i;render();window.scrollTo(0,0)},
+ foodsum(i){const m=i<0?cur():state.history[i];if(!m)return;const n=m.meals.length;
+  dlg('🍙 '+MN[m.mIdx]+' '+m.year,[],null,null,`<div class="log"><span>Total spent</span><span class="neg">-${fmt(m.spent)}</span></div><div class="log"><span>Left over</span><span>${fmt(m.left)}</span></div><div class="log"><span>Meals</span><span>${n}${n?' · avg '+fmt(Math.round(m.spent/n)):''}</span></div><div class="lbl" style="margin:16px 0 4px">All meals 🧾</div>`+mealList(m.meals))},
+ qs(i){const s=state.shortcuts[i];if(s)logMeal(s.cost,s.name)},
+ delsc(i){state.shortcuts.splice(i,1);render()},
+ addsc(){dlg('New shortcut ⚡',[{p:'Meal name'},{p:'Price',t:'number'}],'Save shortcut',v=>{
+   const c=num(v[1]);if(!v[0].trim()||c<=0){toast('Add a name and a price');return false}
+   state.shortcuts.push({name:v[0].trim(),cost:c});render()})},
+ newvault(){
+  if(state.vaults.length>=6)return toast('Max 6 vaults 🐷');
+  dlg('New vault 🐷',[{p:'Vault name'},{p:'Goal (optional)',t:'number'},{p:'First deposit',t:'number'}],'Create vault',v=>{
+   const d=num(v[2]);if(!v[0].trim()){toast('Give it a name');return false}
+   if(d>state.unallocSavings){toast('Not enough free savings');return false}
+   state.unallocSavings-=d;state.vaults.push({name:v[0].trim(),goal:num(v[1]),bal:d});render()})},
+ transfer(i,b){
+  const p=places(),sel=b&&b.dataset.i!==undefined&&b.dataset.i!==''?'v'+b.dataset.i:null;
+  dlg('Move money ⇄',[{opts:p},{opts:p},{p:'Amount',t:'number'}],'Move it',v=>{
+   const a=num(v[2]);
+   if(v[0]==v[1]){toast('Pick two different places');return false}
+   if(a<=0){toast('Enter an amount');return false}
+   if(a>get(v[0])){toast('Not enough there 🥺');return false}
+   add(v[0],-a);add(v[1],a);render()},sel?'Moving from '+esc(pname(sel)):'');
+  if(sel)$('f0').value=sel},
+ addsub(){
+  dlg('New subscription 🔔',[{p:'Service name'},{p:'Cost',t:'number'},{opts:[[1,'Every month'],[3,'Every 3 months'],[6,'Every 6 months'],[12,'Every year']]},{p:'Due day (1-31)',t:'number'},{opts:MN.map((m,i)=>[i,m])}],'Add bill',v=>{
+   const c=num(v[1]),d=parseInt(v[3]);
+   if(!v[0].trim()||c<=0||!(d>=1&&d<=31)){toast('Fill name, cost and a day 1-31');return false}
+   state.subs.push({name:v[0].trim(),cost:c,cycle:+v[2],dueDay:d,dueMonth:+v[4],dueYear:(+v[4]<state.mIdx?state.year+1:state.year)});render()});
+  $('f4').value=state.mIdx},
+ delsub(i){dlg('Delete this subscription?',[],'Delete',()=>{state.subs.splice(i,1);render()},esc(state.subs[i].name))},
+ debt(i,b){
+  const mode=b.dataset.m,lend=mode=='lend';
+  dlg(lend?'Lend money 🤝':'Borrow money 🧸',[{p:"Person's name"},{p:'Amount',t:'number'},{opts:places().filter(p=>p[0]!='food')}],'Confirm',v=>{
+   const a=num(v[1]);if(!v[0].trim()||a<=0){toast('Add a name and amount');return false}
+   if(lend){if(a>get(v[2])){toast('Not enough there 🥺');return false}add(v[2],-a);state.debtsTheyOwe.push({name:v[0].trim(),amt:a,key:v[2]})}
+   else{add(v[2],a);state.debtsIOwe.push({name:v[0].trim(),amt:a,key:v[2]})}
+   render()},lend?'Money leaves the place you pick.':'Money lands in the place you pick.')},
+ settle(i,b){
+  const lend=b.dataset.m=='lend',d=(lend?state.debtsTheyOwe:state.debtsIOwe)[i];
+  if(!d)return;
+  if(lend){add(d.key,d.amt);state.debtsTheyOwe.splice(i,1)}
+  else{if(d.amt>get(d.key))return toast('Not enough funds to pay back');add(d.key,-d.amt);state.debtsIOwe.splice(i,1)}
+  render();toast('Settled ✅')},
+ invest(i,b){
+  const out=b.dataset.m=='out';
+  dlg(out?'Cash out 💰':'Invest 🌱',[{p:'Amount',t:'number'}],out?'Cash out':'Invest',v=>{
+   const a=num(v[0]);if(a<=0){toast('Enter an amount');return false}
+   if(out){if(a>state.investTotal){toast('You have less invested');return false}state.investTotal-=a;state.unallocSavings+=a;state.mo.out+=a}
+   else{if(a>state.unallocSavings){toast('Not enough free savings');return false}state.unallocSavings-=a;state.investTotal+=a;state.mo.inv+=a}
+   render()},out?'Goes back to free savings.':'Comes out of free savings.')},
+ addwant(){dlg('New want 🎀',[{p:'What is it?'},{p:'Price',t:'number'}],'Add to wishlist',v=>{
+   if(!v[0].trim()){toast('Name it first');return false}state.wantsLog.push({name:v[0].trim(),price:num(v[1]),bought:false});render()})},
+ buy(i){const w=state.wantsLog[i];if(w.price>state.unallocSavings)return toast('Not enough free savings yet 🌙');
+  state.unallocSavings-=w.price;w.bought=true;w.bm=state.mIdx;w.by=state.year;render();toast('Enjoy it! 🎉')},
+ delwant(i){state.wantsLog.splice(i,1);render()},
+ menu(){
+  dlg('Menu ⚙️',[],null,null,`<button class="btn soft" data-act="hist" style="margin-bottom:10px">📅 Monthly history</button><button class="btn" data-act="next">🌙 Start next month</button><button class="btn soft" data-act="backup" style="margin-top:10px">💾 Backup / restore</button><button class="btn soft" data-act="pin" style="margin-top:10px">🔒 PIN lock</button><button class="btn warn" data-act="reset" style="margin-top:10px">Reset all data</button>`)},
+ next(){
+  closeDlg();
+  dlg('Next month 🌸',[{p:'New income (TWD)',t:'number'},{opts:[['carry','Keep leftover food money for next month'],['save','Move leftover food money to free savings']]}],'Continue',v=>{
+   const s=num(v[0]);if(s<=0){toast('Enter your income');return false}
+   state.history.unshift(snap());if(v[1]=='save'){state.unallocSavings+=state.foodBal;state.foodBal=0}state.mo={inv:0,out:0};state.vStart=null;histSel=-1;state.mIdx=(state.mIdx+1)%12;if(state.mIdx==0)state.year++;
+   state.foodLog=[];state.startMoney=s;scr='alloc';render()},'Choose what happens to food money you did not spend.')},
+ backup(){
+  closeDlg();
+  dlg('Backup 💾',[{t:'ta',p:'Paste a backup here to restore',v:JSON.stringify(state)}],'Restore from text',v=>{
+   try{const p=JSON.parse(v[0]);if(!p||typeof p.year!='number')throw 0;state=Object.assign(fresh(),p);save();scr=state.onboarded?'home':'start';applyTheme();render();toast('Restored 💜')}
+   catch(e){toast('That backup text is not valid');return false}},'<button class="btn soft" data-act="copy">Copy backup</button>')},
+ copy(){const t=$('f0');t.value=JSON.stringify(state);t.focus();t.select();t.setSelectionRange(0,999999);
+  let ok=false;try{ok=document.execCommand('copy')}catch(e){}
+  try{if(!ok&&navigator.clipboard){navigator.clipboard.writeText(t.value);ok=true}}catch(e){}
+  if(ok){state.lastBackup=Date.now();save()}toast(ok?'Copied 💜':'Long-press the text to copy it')},
+ reset(){closeDlg();dlg('Delete everything?',[],'Yes, reset',()=>{
+   try{localStorage.clear()}catch(e){}
+   state=fresh();scr='start';applyTheme();render()},'This removes every vault, bill and log.')}
+};
+const spent=a=>a.reduce((t,l)=>t+l.cost,0);
+const mealList=a=>a.length?a.map(l=>`<div class="log"><div>${esc(l.name)}<small>${esc(l.ts)}</small></div><span class="neg">-${fmt(l.cost)}</span></div>`).join(''):'<div class="empty">No meals logged 🍡</div>';
+const today=()=>{const d=new Date();return new Date(d.getFullYear(),d.getMonth(),d.getDate())};
+function dueDate(s){let y=s.dueYear;const t=today();if(y===undefined){y=t.getFullYear();if((t-new Date(y,s.dueMonth,s.dueDay))/864e5>31)y++}
+ const dim=new Date(y,s.dueMonth+1,0).getDate();return new Date(y,s.dueMonth,Math.min(s.dueDay,dim))}
+const daysLeft=s=>Math.round((dueDate(s)-today())/864e5);
+const when=n=>n<0?'overdue by '+(-n)+(n==-1?' day':' days'):n==0?'due today':'due in '+n+(n==1?' day':' days');
+const dueList=()=>state.subs.map((s,i)=>({s,i,n:daysLeft(s)})).filter(x=>x.n<=3).sort((a,b)=>a.n-b.n);
+const dueTxt=s=>{const n=daysLeft(s);return 'Due '+MN[dueDate(s).getMonth()]+' '+dueDate(s).getDate()+' · <span style="'+(n<=3?'color:var(--bad);font-weight:800':'')+'">'+when(n)+'</span>'};
+function remind(){if(!state.onboarded)return;const d=dueList(),bk=Date.now()-(state.lastBackup||state.firstUse||Date.now())>30*864e5;
+ if(!d.length&&!bk)return;
+ dlg(d.length?'🔔 Bills coming up':'💾 Backup time',[],null,null,d.map(x=>`<div class="log"><div>${esc(x.s.name)}<small>${when(x.n)} · ${fmt(x.s.cost)} TWD</small></div><button class="sm" data-act="paysub" data-i="${x.i}">Mark paid</button></div>`).join('')+(bk?`<div class="log"><div>Monthly backup<small>Copy your data somewhere safe</small></div><button class="sm" data-act="backup">Back up</button></div>`:''))}
+function checkGoals(){state.vaults.forEach((v,i)=>{if(v.goal>0&&v.bal>=v.goal){if(!v.done){v.done=true;setTimeout(()=>dlg('🎉 Goal reached!',[],null,null,'🎊🐷✨<br><br><strong>'+esc(v.name)+'</strong> hit its goal of '+fmt(v.goal)+' TWD. You did it!<br><br><button class="btn" data-act="finish" data-i="'+i+'">🏆 Complete this vault</button><br>Not ready yet? Close this and keep saving.'),60)}}else v.done=false})}
+function ensure(){if(!state.vStart)state.vStart=state.vaults.map(v=>v.bal);if(!state.mo)state.mo={inv:0,out:0};if(!state.mo.subs)state.mo.subs=[];if(!state.mo.inc)state.mo.inc=[];if(!state.firstUse)state.firstUse=Date.now()}
+function cur(){ensure();return{mIdx:state.mIdx,year:state.year,income:state.startMoney,spent:spent(state.foodLog),left:state.foodBal,meals:state.foodLog,free:state.unallocSavings,vaults:state.vaults.reduce((t,v)=>t+v.bal,0),invest:state.investTotal,inv:state.mo.inv,out:state.mo.out,vadds:state.vaults.map((v,i)=>({name:v.name,add:v.bal-(state.vStart[i]||0),bal:v.bal})).filter(x=>x.add>0),subs:state.mo.subs,inc:state.mo.inc,wants:state.wantsLog.filter(w=>w.bought&&w.bm===state.mIdx&&w.by===state.year).map(w=>({name:w.name,price:w.price}))}}
+function snap(){return cur()}
+function monthSum(m,i){
+ const inc=m.inc||[],su=m.subs||[],w=m.wants||[],va=m.vadds||[],wt=w.reduce((t,x)=>t+x.price,0),inv=m.inv||0,out=m.out||0,n=m.meals.length;
+ const row=(a,b,c)=>`<div class="log"><span>${a}</span><span class="${c||''}${bl()}">${b}</span></div>`;
+ const sec=t=>`<div class="lbl" style="margin:18px 0 4px">${t}</div>`;
+ return `<div class="card"><div class="log" style="border:0;padding:0"><strong style="font-size:18px">📅 ${MN[m.mIdx]} ${m.year}</strong><button class="sm" data-act="mpick" aria-label="Choose month">▾</button></div>
+ <small style="color:var(--mu);font-weight:700">${i<0?'This month so far':'Finished month'} · planned ${fmt(m.income)}</small>
+ ${sec('🍙 Food')}${row('Spent ('+n+' meals)','-'+fmt(m.spent),'neg')}${row('Left over',fmt(m.left))}
+ <button class="btn soft" data-act="foodsum" data-i="${i}" style="margin-top:10px">Open food summary</button>
+ ${sec('🌱 Investments')}${inv||out?row('Invested','+'+fmt(inv),'pos')+(out?row('Cashed out','-'+fmt(out)):''):'<div class="empty">No investing this month</div>'}
+ ${sec('🐷 Saved in vaults')}${va.length?va.map(x=>row(esc(x.name),'+'+fmt(x.add)+' <small>(now '+fmt(x.bal)+')</small>','pos')).join(''):'<div class="empty">No money added to vaults</div>'}
+ ${sec('🎀 Wants bought')}${w.length?w.map(x=>row(esc(x.name),'-'+fmt(x.price),'neg')).join('')+row('<strong>Total</strong>','-'+fmt(wt),'neg'):'<div class="empty">No wants bought</div>'}
+ ${sec('🔔 Subscriptions paid')}${su.length?su.map(x=>row(esc(x.name),'-'+fmt(x.cost),'neg')).join(''):'<div class="empty">No bills paid</div>'}
+ ${sec('💰 Money added')}${inc.length?inc.map(x=>row(esc(x.name),'+'+fmt(x.amt),'pos')).join(''):'<div class="empty">No extra income</div>'}</div>`}
+function histHTML(){
+ const sel=state.history[histSel],m=sel||cur(),i=sel?histSel:-1;
+ return `<button class="sm" data-act="go" data-p="home" style="align-self:flex-start">← Back</button>`+monthSum(m,i)+(state.history.length?'':'<div class="card empty">Earlier months show up under ▾ after you tap Start next month 🌙</div>')}
+function logMeal(c,n,ok){
+ if(c>state.foodBal&&!ok){const diff=c-state.foodBal;
+  dlg('Over food budget 🥺',[{opts:places().filter(p=>p[0]!='food')}],'Cover it & log',v=>{
+   if(diff>get(v[0])){toast('Not enough there');return false}
+   add(v[0],-diff);state.foodBal+=diff;logMeal(c,n,true)},fmt(diff)+' TWD is missing. Take it from:');
+  $('f0').value='unsav';return}
+ state.foodBal-=c;const d=new Date();
+ state.foodLog.unshift({name:n,cost:c,ts:MN[d.getMonth()].slice(0,3)+' '+d.getDate()+', '+String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0')});
+ render()}
+const vsum=()=>state.vaults.reduce((t,v,i)=>t+num(($('aV'+i)||{}).value),0);
+function calc(){
+ const l=state.startMoney-num($('aF').value)-num($('aS').value)-vsum(),e=$('left');
+ e.textContent=fmt(l);e.className='big '+(l<0?'neg':'');}
+
+document.addEventListener('click',e=>{
+ const b=e.target.closest('[data-act]');if(!b)return;
+ const f=A[b.dataset.act];if(f){e.preventDefault();f(b.dataset.i===undefined?NaN:+b.dataset.i,b)}});
+document.addEventListener('input',e=>{if(/^a[FSV]/.test(e.target.id))calc()});
+
+/* ---- render ---- */
+const bl=()=>privacy?' blur':'';
+function render(){ensure();checkGoals();
+ const app=state.onboarded&&scr!='alloc'&&scr!='start';
+ $('top').classList.toggle('hidden',!app);$('nav').classList.toggle('hidden',!app);
+ $('mlabel').textContent=MN[state.mIdx]+' '+state.year;
+ $('nav').innerHTML=TABS.map(t=>`<button class="${scr==t[0]?'on':''}" data-act="go" data-p="${t[0]}"><span>${t[1]}</span>${t[2]}${t[0]=='subs'&&dueList().length?'<b style="color:var(--bad)"> ●</b>':''}</button>`).join('');
+ const v=$('view');
+ if(scr=='start'){
+  v.innerHTML=`<div class="card" style="margin-top:6vh"><div style="text-align:center;font-size:64px" class="mascot">🐰</div><h1>Hi, let's plan! 🌷</h1><div class="sub">Give every coin a little home</div>
+  <div class="row"><select id="sM" style="flex:1.6">${MN.map((m,i)=>`<option value="${i}" ${i==state.mIdx?'selected':''}>${m}</option>`).join('')}</select><input id="sY" type="number" value="${state.year}"></div>
+  <input id="sS" type="number" inputmode="decimal" placeholder="Money you have this month (TWD)"><button class="btn" data-act="start">Start planning ✨</button></div>`;return}
+ if(scr=='alloc'){
+  v.innerHTML=`<div class="card" style="margin-top:4vh"><div style="text-align:center;font-size:44px">🧺</div><div class="lbl" style="text-align:center">Still to place · ${fmt(state.startMoney)} TWD total</div>
+  <div class="big" id="left" style="text-align:center;font-size:44px;margin-bottom:16px">${fmt(state.startMoney)}</div>
+  <div class="lbl">🍙 Food budget</div><input id="aF" type="number" inputmode="decimal" placeholder="Amount for food">
+  <div class="lbl">💜 Savings</div><input id="aS" type="number" inputmode="decimal" placeholder="Amount for savings">${state.vaults.map((v,i)=>`<div class="lbl">${PETS[i%6]} ${esc(v.name)}</div><input id="aV${i}" type="number" inputmode="decimal" placeholder="Add to ${esc(v.name)}">`).join('')}
+  <button class="btn soft" data-act="rest">Put the rest in savings</button><button class="btn" data-act="finalize" style="margin-top:10px">Finalize budget 🎉</button></div>`;return}
+ let h='';
+ if(scr=='home'){
+  const msg=state.foodBal<=0?'Food money is all used up. Time to move some in? 🥺':'You are doing great, keep it up! 💜';
+  h=`<div class="card hero"><div class="mascot">🐰</div><div><div class="lbl">Food budget 🍙</div><div class="big${bl()}">${fmt(state.foodBal)}</div></div><button class="eye" data-act="eye">${privacy?'🙈':'👁'}</button></div>
+  <div class="bubble">${msg}</div><button class="btn soft" data-act="income">💰 Add money</button>
+  <div class="card"><div class="lbl">Quick log ⚡</div>${state.shortcuts.map((s,i)=>`<button class="chip" data-act="qs" data-i="${i}">${esc(s.name)} · ${fmt(s.cost)}<i data-act="delsc" data-i="${i}">✕</i></button>`).join('')}<button class="chip add" data-act="addsc">＋ shortcut</button>
+  <div class="row" style="margin-top:6px"><input id="fn" placeholder="Meal name 🍜" style="flex:1.6"><input id="fc" type="number" inputmode="decimal" placeholder="Cost"></div><button class="btn" data-act="logfood">Log meal</button></div>
+  <div class="card"><div class="lbl">Recent meals 🧾</div>${state.foodLog.length?state.foodLog.slice(0,8).map((l,i)=>`<div class="log"><div>${esc(l.name)}<small>${esc(l.ts)}</small></div><div><span class="neg">-${fmt(l.cost)}</span> <button class="sm d" data-act="delmeal" data-i="${i}">✕</button></div></div>`).join(''):'<div class="empty">No meals yet 🍡</div>'}${state.foodLog.length?`<button class="btn soft" data-act="hist" style="margin-top:12px">View all ${state.foodLog.length} meals 📅</button>`:''}</div>`}
+ if(scr=='vaults'){
+  h=`<div class="card"><div class="lbl">Free savings 💜</div><div class="big${bl()}">${fmt(state.unallocSavings)}</div>${state.vaults.length?`<button class="btn" data-act="vadd" style="margin-top:12px">＋ Put savings into a vault</button>`:''}</div>`+
+  state.vaults.map((x,i)=>{const p=x.goal>0?Math.min(100,x.bal/x.goal*100):0;
+   return `<div class="card"><div class="row" style="align-items:center"><div style="font-weight:900">${PETS[i%6]} ${esc(x.name)}${x.goal>0&&x.bal>=x.goal?' 🎉':''}</div><div style="text-align:right;color:var(--mu);font-size:12px;font-weight:700">${x.goal>0?'goal '+fmt(x.goal):''}</div></div>
+   <div class="big${bl()}" style="font-size:28px">${fmt(x.bal)}</div>${x.goal>0?`<div class="bar"><i style="width:${p}%"></i></div>`:''}
+   <div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap"><button class="sm" data-act="vadd" data-i="${i}">＋ Add money</button><button class="sm" data-act="transfer" data-i="${i}">Move money ⇄</button><button class="sm" data-act="finish" data-i="${i}">${x.goal>0&&x.bal>=x.goal?'🏆 Complete vault':'Close vault'}</button></div></div>`}).join('')+
+  (state.vaults.length?'':'<div class="card empty">No vaults yet. Make a cozy little one 🐷</div>')+(state.vaultsDone&&state.vaultsDone.length?`<div class="card"><div class="lbl">🏆 Finished vaults</div>${state.vaultsDone.map(d=>`<div class="log"><div>${d.reached?'🏆':'📦'} ${esc(d.name)}<small>${MN[d.mIdx]} ${d.year} · ${d.how=='spent'?'spent':'moved'}</small></div><span class="pos${bl()}">${fmt(d.saved)}${d.goal>0?' / '+fmt(d.goal):''}</span></div>`).join('')}</div>`:'')+
+  `<button class="btn soft" data-act="newvault">＋ New vault (max 6)</button><button class="btn" data-act="transfer" data-i="">Move money ⇄</button>`}
+ if(scr=='subs'){
+  const m=state.subs.reduce((a,s)=>a+s.cost/s.cycle,0);
+  h=`<div class="card"><div class="lbl">Per month, roughly 🔔</div><div class="big${bl()}">${fmt(Math.round(m))}</div></div>`+
+  state.subs.map((s,i)=>`<div class="card"><div class="log" style="padding-top:0"><strong>${esc(s.name)}</strong><span>${fmt(s.cost)} TWD</span></div><div class="log" style="border:0;padding-bottom:0"><small>${dueTxt(s)} · every ${s.cycle==12?'year':s.cycle+' mo'}</small><span style="display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end"><button class="sm" data-act="paysub" data-i="${i}">Mark paid</button><button class="sm" data-act="editsub" data-i="${i}">Edit</button><button class="sm d" data-act="delsub" data-i="${i}">Delete</button></span></div></div>`).join('')+
+  (state.subs.length?'':'<div class="card empty">No bills tracked 🌼</div>')+`<button class="btn" data-act="addsub">＋ Add subscription</button>`}
+ if(scr=='invest'){
+  h=`<div class="card hero"><div class="mascot">🌱</div><div><div class="lbl">Invested</div><div class="big${bl()}">${fmt(state.investTotal)}</div></div></div>
+  <div class="row"><button class="btn" data-act="invest" data-m="in">Invest 🌱</button><button class="btn soft" data-act="invest" data-m="out">Cash out</button></div>`}
+ if(scr=='wants'){
+  h=state.wantsLog.map((w,i)=>`<div class="card"><div class="log" style="padding-top:0"><strong>${w.bought?'✅':'🎀'} ${esc(w.name)}</strong><span>${fmt(w.price)}</span></div><div style="display:flex;gap:8px;margin-top:10px">${w.bought?'':`<button class="sm" data-act="buy" data-i="${i}">Bought it!</button>`}<button class="sm d" data-act="delwant" data-i="${i}">Remove</button></div></div>`).join('')+
+  (state.wantsLog.length?'':'<div class="card empty">Your wishlist is empty ✨</div>')+`<button class="btn" data-act="addwant">＋ Add a want</button>`}
+ if(scr=='debts'){
+  const L=(arr,m,c)=>arr.length?arr.map((d,i)=>`<div class="log"><div>${esc(d.name)}<small>${m=='lend'?'From':'Kept in'}: ${esc(pname(d.key))}</small></div><div><span class="${c}" style="margin-right:8px">${fmt(d.amt)}</span><button class="sm" data-act="settle" data-m="${m}" data-i="${i}">${m=='lend'?'Paid me':'I paid'}</button></div></div>`).join(''):'<div class="empty">Nothing here 🌈</div>';
+  h=`<div class="card"><div class="lbl">I owe 🧸</div>${L(state.debtsIOwe,'owe','neg')}<button class="btn soft" data-act="debt" data-m="owe" style="margin-top:12px">＋ Borrowed money</button></div>
+  <div class="card"><div class="lbl">They owe me 🤝</div>${L(state.debtsTheyOwe,'lend','pos')}<button class="btn soft" data-act="debt" data-m="lend" style="margin-top:12px">＋ Lent money</button></div>`}
+ if(scr=='hist')h=histHTML();
+ v.innerHTML=h;save();
+}
+document.addEventListener('visibilitychange',()=>{if(document.hidden&&state.pin)$('lock').classList.remove('hidden')});
+window.onload=load;
+</script>
+</body>
+</html>
